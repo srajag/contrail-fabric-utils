@@ -995,7 +995,7 @@ def setup_webui_node(*args):
             cmd += " --admin_password %s" % ks_admin_password
             cmd += " --admin_token %s" % get_keystone_admin_token()
             cmd += " --admin_tenant_name %s" % get_keystone_admin_tenant_name()
-	elif orch == 'vcenter':
+    elif orch == 'vcenter':
             vcenter_info = getattr(env, 'vcenter', None)
             if not vcenter_info:
                 print 'Error: vcenter block is not defined in testbed file.Exiting'
@@ -1254,7 +1254,7 @@ def setup_only_vrouter_node(manage_nova_compute='yes', *args):
         if vmware:
             if esxi_data:
                 # Esxi provisioning parameters
-            	cmd += " --vmware %s" % esxi_data['ip']
+                cmd += " --vmware %s" % esxi_data['ip']
                 cmd += " --vmware_username %s" % esxi_data['username']
                 cmd += " --vmware_passwd %s" % esxi_data['password']
                 cmd += " --vmware_vmpg_vswitch %s" % esxi_data['vm_vswitch']
@@ -1264,6 +1264,10 @@ def setup_only_vrouter_node(manage_nova_compute='yes', *args):
                 cmd += " --vmware_username %s" % vmware_info['esxi']['esx_ip']
                 cmd += " --vmware_passwd %s" % vmware_info['esxi']['esx_password']
                 cmd += " --vmware_vmpg_vswitch %s" % vmware_info['esx_vm_vswitch']
+
+        dpdk = getattr(testbed, 'dpdk', None)
+        if dpdk:
+            cmd += " --dpdk"
 
         # Execute the script to provision compute node.
         with  settings(host_string=host_string):
@@ -1514,6 +1518,7 @@ def setup_all(reboot='True'):
     execute('setup_rabbitmq_cluster')
     execute('increase_limits')
     execute('increase_ulimits')
+    execute('setup_hugepages')
     execute('setup_database')
     execute('verify_database')
     execute('setup_orchestrator')
@@ -1549,6 +1554,7 @@ def setup_without_openstack(manage_nova_compute='yes', reboot='True'):
     execute('setup_ha')
     execute('setup_rabbitmq_cluster')
     execute('increase_limits')
+    execute('setup_hugepages')
     execute('setup_database')
     execute('verify_database')
     execute('setup_cfgm')
@@ -1687,6 +1693,7 @@ def reset_config():
         execute(setup_rabbitmq_cluster)
         execute(increase_limits)
         execute(increase_ulimits)
+        execute(setup_hugepages)
         execute(setup_database)
         execute(verify_database)
         execute(setup_orchestrator)
@@ -1753,7 +1760,7 @@ def setup_esxi_computevm(deb=None):
         return
     for compute_node in env.roledefs['compute']:
         if compute_node in compute_vm_info.keys():
-		provision_esxi(deb, compute_vm_info[compute_node])
+        provision_esxi(deb, compute_vm_info[compute_node])
 
 
 
