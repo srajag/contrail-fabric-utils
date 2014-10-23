@@ -896,6 +896,8 @@ def setup_only_vrouter_node(manage_nova_compute='yes', *args):
         compute_mgmt_ip= host_string.split('@')[1]
         compute_control_ip= hstr_to_ip(compute_host)
 
+        dpdk = getattr(testbed, 'dpdk', None)
+
         # Check and configure the VGW details
         set_vgw= 0
         if 'vgw' in env.roledefs:
@@ -964,6 +966,8 @@ def setup_only_vrouter_node(manage_nova_compute='yes', *args):
                     cmd += " --contrail_internal_vip %s" % contrail_internal_vip
                 if internal_vip or contrail_internal_vip:
                     cmd += " --mgmt_self_ip %s" % compute_mgmt_ip
+		if dpdk:
+			cmd += " --dpdk"
                 print cmd
                 run(cmd)
 #end setup_vrouter
@@ -1165,6 +1169,7 @@ def setup_all(reboot='True'):
     execute('setup_rabbitmq_cluster')
     execute('increase_limits')
     execute('increase_ulimits')
+    execute('setup_hugepages')
     execute('setup_database')
     execute('verify_database')
     execute('setup_openstack')
@@ -1203,6 +1208,7 @@ def setup_without_openstack(manage_nova_compute='yes'):
     execute('setup_ha')
     execute('setup_rabbitmq_cluster')
     execute('increase_limits')
+    execute('setup_hugepages')
     execute('setup_database')
     execute('verify_database')
     execute('setup_cfgm')
@@ -1241,6 +1247,7 @@ def setup_all_with_images():
     execute(setup_rabbitmq_cluster)
     execute(increase_limits)
     execute(increase_ulimits)
+    execute(setup_hugepages)
     execute(setup_database)
     execute(setup_openstack)
     execute(setup_cfgm)
@@ -1264,6 +1271,7 @@ def run_setup_demo():
     execute(setup_rabbitmq_cluster)
     execute(increase_limits)
     execute(increase_ulimits)
+    execute(setup_hugepages)
     execute(setup_database)
     execute(setup_openstack)
     execute(setup_cfgm)
@@ -1360,6 +1368,7 @@ def reset_config():
         execute(setup_rabbitmq_cluster)
         execute(increase_limits)
         execute(increase_ulimits)
+        execute(setup_hugepages)
         execute(setup_database)
         execute(verify_database)
         execute(setup_openstack)
