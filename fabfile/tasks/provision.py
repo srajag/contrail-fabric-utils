@@ -1268,6 +1268,9 @@ def setup_only_vrouter_node(manage_nova_compute='yes', *args):
         dpdk = getattr(testbed, 'dpdk', None)
         if dpdk:
             cmd += " --dpdk"
+            workaround_mgmt_ip = dpdk[env.host_string]['workaround_mgmt_ip']
+        if workaround_mgmt_ip:
+            cmd += " --workaround_mgmt_ip %s" % workaround_mgmt_ip
 
         # Execute the script to provision compute node.
         with  settings(host_string=host_string):
