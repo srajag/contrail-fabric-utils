@@ -445,7 +445,6 @@ def install_only_vrouter_node(manage_nova_compute='yes', *args):
                        'nfs-kernel-server',
                        'contrail-vrouter-dpdk-init',
                        'contrail-vrouter-dpdk',
-                       'igb-uio-dkms',
                        'liburcu1'
                       ]
             if (manage_nova_compute == 'no' and ostype in ['centos']):
