@@ -995,7 +995,7 @@ def setup_webui_node(*args):
             cmd += " --admin_password %s" % ks_admin_password
             cmd += " --admin_token %s" % get_keystone_admin_token()
             cmd += " --admin_tenant_name %s" % get_keystone_admin_tenant_name()
-    elif orch == 'vcenter':
+        elif orch == 'vcenter':
             vcenter_info = getattr(env, 'vcenter', None)
             if not vcenter_info:
                 print 'Error: vcenter block is not defined in testbed file.Exiting'
@@ -1763,7 +1763,7 @@ def setup_esxi_computevm(deb=None):
         return
     for compute_node in env.roledefs['compute']:
         if compute_node in compute_vm_info.keys():
-        provision_esxi(deb, compute_vm_info[compute_node])
+            provision_esxi(deb, compute_vm_info[compute_node])
 
 
 
