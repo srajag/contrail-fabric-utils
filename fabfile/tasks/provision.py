@@ -897,8 +897,6 @@ def setup_only_vrouter_node(manage_nova_compute='yes', *args):
         compute_control_ip= hstr_to_ip(compute_host)
 
         dpdk = getattr(testbed, 'dpdk', None)
-        if dpdk:
-            workaround_mgmt_ip = dpdk[env.host_string]['workaround_mgmt_ip']
 
         # Check and configure the VGW details
         set_vgw= 0
@@ -970,8 +968,6 @@ def setup_only_vrouter_node(manage_nova_compute='yes', *args):
                     cmd += " --mgmt_self_ip %s" % compute_mgmt_ip
 		if dpdk:
 			cmd += " --dpdk"
-                if workaround_mgmt_ip:
-                        cmd += " --workaround_mgmt_ip %s" % workaround_mgmt_ip
                 print cmd
                 run(cmd)
 #end setup_vrouter
