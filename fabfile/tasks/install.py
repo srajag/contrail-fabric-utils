@@ -427,7 +427,14 @@ def create_install_repo_node(*args):
             if (len(contrail_setup_pkgs) == 1 and get_release() in contrail_setup_pkgs[0]):
                 print "Contrail install repo created already in node: %s." % host_string
                 continue
-            run("sudo /opt/contrail/contrail_packages/setup.sh")
+
+            # Pass env variable on DPDK mode nodes. It causes some additional
+            # DEBs to be put into the contrail_instal_repo
+            dpdk = getattr(testbed, 'dpdk', None)
+            if dpdk and host_string in dpdk.keys():
+                run("sudo DPDK_MODE='True' /opt/contrail/contrail_packages/setup.sh")
+            else:
+                run("sudo /opt/contrail/contrail_packages/setup.sh")
 
 @roles('build')
 @task
