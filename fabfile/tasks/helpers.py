@@ -806,6 +806,31 @@ def setup_hugepages_node(*args):
 def setup_hugepages():
     setup_hugepages_node(env.host_string)
 
+@task
+def setup_coremask_node(*args):
+    """Setup core mask on one or list of nodes
+    USAGE: fab setup_coremask_node:user@host1,user@host2,...
+    """
+    vrouter_file = '/etc/contrail/supervisord_vrouter_files/contrail-vrouter-dpdk.ini'
+    default_coremask = '0xf' # first four CPUs
+
+    for host_string in args:
+        dpdk = getattr(env, 'dpdk', None)
+        if dpdk:
+            # do not crash when coremask was not specified in testbed
+            try:
+                coremask = dpdk[env.host_string]['coremask']
+            except KeyError:
+                coremask = default_coremask
+        else:
+            return
+
+        if (coremask == ""):
+            coremask = default_coremask
+
+        with settings(host_string=host_string):
+                sudo('sudo sed -i \'s/__COREMASK__/%s/\' %s' %(coremask, vrouter_file))
+
 @roles('openstack')
 @task
 def increase_ulimits():

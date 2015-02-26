@@ -1323,6 +1323,9 @@ def setup_only_vrouter_node(manage_nova_compute='yes', configure_nova='yes', *ar
         # Setup hugepages if necessary
         setup_hugepages_node(host_string)
 
+        # Setup affinity mask if necessary
+        setup_coremask_node(host_string)
+
         # Execute the script to provision compute node.
         with  settings(host_string=host_string):
             if detect_ostype() == 'ubuntu':
@@ -2049,4 +2052,3 @@ def setup_zones():
     """Setup availability zones."""
     setup_esx_zone()
 #end setup_zones
-
