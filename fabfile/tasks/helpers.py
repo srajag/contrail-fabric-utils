@@ -821,15 +821,16 @@ def setup_coremask_node(*args):
             try:
                 coremask = dpdk[env.host_string]['coremask']
             except KeyError:
-                coremask = default_coremask
+                return
         else:
             return
 
         if (coremask == ""):
-            coremask = default_coremask
+            return
 
+        # prepend taskset only if valid coremask was specified in testbed
         with settings(host_string=host_string):
-                sudo('sudo sed -i \'s/__COREMASK__/%s/\' %s' %(coremask, vrouter_file))
+            sudo('sed -i \'s/command=/command=taskset %s /\' %s' %(coremask, vrouter_file))
 
 @roles('openstack')
 @task
