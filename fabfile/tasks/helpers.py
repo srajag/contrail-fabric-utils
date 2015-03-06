@@ -812,7 +812,7 @@ def setup_coremask_node(*args):
     USAGE: fab setup_coremask_node:user@host1,user@host2,...
     """
     vrouter_file = '/etc/contrail/supervisord_vrouter_files/contrail-vrouter-dpdk.ini'
-    default_coremask = '0xf' # first four CPUs
+    taskset_param = ''
 
     for host_string in args:
         dpdk = getattr(env, 'dpdk', None)
@@ -825,12 +825,18 @@ def setup_coremask_node(*args):
         else:
             return
 
-        if (coremask == ""):
+        if (coremask == ''):
             return
+
+        # supported coremask format: hex: (0x3f); list: (0,3-5), (0,1,2,3,4,5)
+        # if specified as a list of cpus, -c flag must be provided to taskset
+        if ',' or '-' in coremask:
+            taskset_param = ' -c'
 
         # prepend taskset only if valid coremask was specified in testbed
         with settings(host_string=host_string):
-            sudo('sed -i \'s/command=/command=taskset %s /\' %s' %(coremask, vrouter_file))
+            sudo('sed -i \'s/command=/command=taskset%s %s /\' %s' \
+                %(taskset_param, coremask, vrouter_file))
 
 @roles('openstack')
 @task
