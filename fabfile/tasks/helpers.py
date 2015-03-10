@@ -830,8 +830,13 @@ def setup_coremask_node(*args):
 
         # supported coremask format: hex: (0x3f); list: (0,3-5), (0,1,2,3,4,5)
         # if specified as a list of cpus, -c flag must be provided to taskset
-        if ',' in coremask or '-' in coremask:
-            taskset_param = ' -c'
+        if re.compile('^0x[0-9a-fA-F]+$').match(coremask):
+            param = ''
+        elif re.compile('^[0-9\-\,]+$').match(coremask):
+            param = ' -c'
+        else:
+            print "Invalid coremask."
+            exit(1)
 
         # prepend taskset only if valid coremask was specified in testbed
         with settings(host_string=host_string):
