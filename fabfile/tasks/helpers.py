@@ -812,33 +812,30 @@ def setup_coremask_node(*args):
     USAGE: fab setup_coremask_node:user@host1,user@host2,...
     """
     vrouter_file = '/etc/contrail/supervisord_vrouter_files/contrail-vrouter-dpdk.ini'
-    taskset_param = ''
 
     for host_string in args:
         dpdk = getattr(env, 'dpdk', None)
         if dpdk:
-            # do not crash when coremask was not specified in testbed
-            try:
-                coremask = dpdk[env.host_string]['coremask']
-            except KeyError:
-                return
+            coremask = dpdk[env.host_string]['coremask']
         else:
             return
 
-        if (coremask == ''):
-            return
+        if (coremask == ""):
+            print "Error: Core mask not defined."
+            sys.exit(1)
+
+        # if a list of cpus is provided, -c flag must be passed to taskset
+        if ',' in coremask or '-' in coremask:
+            taskset_param = ' -c'
+        else:
+            taskset_param = ''
 
         # supported coremask format: hex: (0x3f); list: (0,3-5), (0,1,2,3,4,5)
-        # if specified as a list of cpus, -c flag must be provided to taskset
-        if re.compile('^0x[0-9a-fA-F]+$').match(coremask):
-            param = ''
-        elif re.compile('^[0-9\-\,]+$').match(coremask):
-            param = ' -c'
-        else:
-            print "Invalid coremask."
-            exit(1)
+        # try taskset on a dummy command
+        if run('taskset%s %s true' %(taskset_param, coremask), quiet=True).failed:
+            print "Error: Core mask is invalid."
+            sys.exit(1)
 
-        # prepend taskset only if valid coremask was specified in testbed
         with settings(host_string=host_string):
             sudo('sed -i \'s/command=/command=taskset%s %s /\' %s' \
                 %(taskset_param, coremask, vrouter_file))
